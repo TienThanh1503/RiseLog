@@ -828,12 +828,12 @@ export default function DailyStudyProgressVN() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
             />
-            <input
-              type="color"
-              value={newColor}
-              onChange={(e) => setNewColor(e.target.value)}
-              className="w-12 h-10 rounded-xl border"
-            />
+              <input
+                type="color"
+                value={newColor}
+                onChange={(e) => setNewColor(e.target.value)}
+                className="color-input w-14 h-10 rounded-xl border p-0"
+              />
             <input
               type="number"
               min={0}
@@ -866,7 +866,7 @@ export default function DailyStudyProgressVN() {
                     type="color"
                     value={s.color}
                     onChange={(e) => recolorSubject(s.id, e.target.value)}
-                    className="w-10 h-9 rounded-lg border"
+                    className="color-input w-14 h-10 rounded-xl border p-0"
                   />
                   <input
                     type="number"

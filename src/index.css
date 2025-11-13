@@ -1,1 +1,21 @@
 @import "tailwindcss";
+/* Ô chọn màu – lấp đầy, không còn khoảng trắng bên trong */
+.color-input {
+  padding: 0 !important;
+}
+
+/* Chrome, Edge, Safari */
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 0 !important;
+}
+
+.color-input::-webkit-color-swatch {
+  border: none !important;
+  border-radius: 0.75rem !important; /* khớp rounded-xl */
+}
+
+/* Firefox */
+.color-input::-moz-color-swatch {
+  border: none !important;
+  border-radius: 0.75rem !important;
+}
