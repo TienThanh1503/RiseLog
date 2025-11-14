@@ -600,27 +600,28 @@ export default function DailyStudyProgressVN() {
             </div>
           )}
           {subjects.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                onClick={() => markAllToday("done")}
-                className="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
-              >
-                Đánh dấu hôm nay: ✓
-              </button>
-              <button
-                onClick={() => markAllToday("partial")}
-                className="px-3 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600"
-              >
-                Đánh dấu hôm nay: ½
-              </button>
-              <button
-                onClick={() => markAllToday("miss")}
-                className="px-3 py-2 rounded-xl bg-rose-500 text-white hover:bg-rose-600"
-              >
-                Đánh dấu hôm nay: •
-              </button>
-            </div>
-          )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => markAllToday("done")}
+              className="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 whitespace-nowrap"
+            >
+              Đánh dấu hôm nay: ✓
+            </button>
+            <button
+              onClick={() => markAllToday("partial")}
+              className="px-3 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600 whitespace-nowrap"
+            >
+              Đánh dấu hôm nay: ½
+            </button>
+            <button
+              onClick={() => markAllToday("miss")}
+              className="px-3 py-2 rounded-xl bg-rose-500 text-white hover:bg-rose-600 whitespace-nowrap"
+            >
+              Đánh dấu hôm nay: •
+            </button>
+          </div>
+        )}
+
         </section>
 
         {/* Today Panel */}
@@ -628,83 +629,90 @@ export default function DailyStudyProgressVN() {
           <h2 className="text-lg font-semibold">
             🗓️ Ngày: {DATE_FMT.toLabel(selectedDate)}
           </h2>
+
           {subjects.length === 0 ? (
             <p className="mt-2 text-slate-600">Chưa có môn nào.</p>
           ) : (
-            <div className="mt-2 flex flex-col gap-3">
+            <div className="mt-3 flex flex-col gap-3">
               {subjects.map((s: Subject) => {
                 const key = DATE_FMT.toKey(selectedDate);
                 const entry = getEntry(key, s.id);
                 const minutes = entry.minutes || 0;
-                const st = statusFromMinutes(minutes, s.targetMin) ?? (entry.status ?? null);
-                const ui = STATUS_UI[(st ?? "null") as "null" | "miss" | "partial" | "done"];
+                const st =
+                  statusFromMinutes(minutes, s.targetMin) ??
+                  (entry.status ?? null);
+                const ui =
+                  STATUS_UI[
+                    (st ?? "null") as "null" | "miss" | "partial" | "done"
+                  ];
 
                 return (
                   <div
                     key={s.id}
-                    className="flex flex-col sm:flex-row sm:items-center gap-2"
+                    className="flex items-center gap-2 text-sm"
                   >
-                    <div className="flex items-center gap-2">
+                    {/* chấm màu + tên môn (cố định ~90px, dài thì …) */}
+                    <div className="flex items-center gap-2 w-[90px] shrink-0">
                       <span
                         className="inline-block w-2.5 h-2.5 rounded-full"
                         style={{ background: s.color }}
                       />
-                      <span className="sm:w-28 w-full truncate" title={s.name}>
-                        {s.name}
+                      <span className="truncate">{s.name}</span>
+                    </div>
+
+                    {/* nút trạng thái */}
+                    <button
+                      className={`shrink-0 w-10 h-9 rounded-lg border text-sm font-semibold
+                        ${
+                          st === "done"
+                            ? "bg-emerald-100 border-emerald-200"
+                            : st === "partial"
+                            ? "bg-amber-100 border-amber-200"
+                            : st === "miss"
+                            ? "bg-rose-100 border-rose-200"
+                            : "bg-white"
+                        }`}
+                      onClick={() =>
+                        upsertRecord(key, s.id, {
+                          status: nextStatus(entry.status ?? null),
+                        })
+                      }
+                      title={ui?.title}
+                    >
+                      {ui?.label ?? "—"}
+                    </button>
+
+                    {/* số phút / target */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <input
+                        type="number"
+                        className="w-16 px-2 py-1 rounded-lg bg-slate-50 border text-right"
+                        min={0}
+                        value={entry.minutes ?? ""}
+                        onChange={(e) =>
+                          upsertRecord(key, s.id, {
+                            minutes: Number(e.target.value) || 0,
+                          })
+                        }
+                      />
+                      <span className="text-xs text-slate-500 whitespace-nowrap">
+                        / {s.targetMin || 0}′
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:flex-none">
-                      <button
-                        className={`px-3 py-1 rounded-lg border text-sm font-semibold w-full sm:w-auto
-                          ${
-                            st === "done"
-                              ? "bg-emerald-100 border-emerald-200"
-                              : st === "partial"
-                              ? "bg-amber-100 border-amber-200"
-                              : st === "miss"
-                              ? "bg-rose-100 border-rose-200"
-                              : "bg-white"
-                          }`}
-                        onClick={() =>
-                          upsertRecord(key, s.id, { status: nextStatus(entry.status ?? null) })
-                        }
-                        title={ui?.title}
-                      >
-                        {ui?.label ?? "—"}
-                      </button>
-
-                      <div className="flex items-center gap-1 w-full sm:w-auto">
-                        <input
-                          type="number"
-                          className="w-full sm:w-24 px-2 py-1 rounded-lg bg-slate-50 border"
-                          placeholder="phút"
-                          min={0}
-                          value={entry.minutes ?? ""}
-                          onChange={(e) =>
-                            upsertRecord(key, s.id, {
-                              minutes: Number(e.target.value) || 0,
-                            })
-                          }
-                          title="Phút đã học"
-                        />
-                        <span className="text-xs text-slate-500 whitespace-nowrap">
-                          / {s.targetMin || 0}′
-                        </span>
-                      </div>
-                    </div>
-
+                    {/* ô ghi chú chiếm phần còn lại */}
                     <input
                       type="text"
-                      className="px-2 py-1 rounded-lg bg-slate-50 border w-full"
-                      placeholder="ghi chú (tùy chọn)"
+                      className="flex-1 min-w-0 px-2 py-1 rounded-lg bg-slate-50 border"
+                      placeholder="ghi chú"
                       value={entry.note || ""}
-                      onChange={(e) => upsertRecord(key, s.id, { note: e.target.value })}
+                      onChange={(e) =>
+                        upsertRecord(key, s.id, { note: e.target.value })
+                      }
                     />
                   </div>
                 );
               })}
-
             </div>
           )}
         </section>
@@ -857,41 +865,53 @@ export default function DailyStudyProgressVN() {
           {subjects.length > 0 && (
             <ul className="mt-3 space-y-2">
               {subjects.map((s: Subject) => (
-                <li key={s.id} className="flex items-center gap-2">
-                  <span
-                    className="inline-block w-3 h-3 rounded-full"
-                    style={{ background: s.color }}
-                  />
-                  <input
-                    className="px-2 py-1 rounded-lg bg-slate-50 border flex-1"
-                    value={s.name}
-                    onChange={(e) => renameSubject(s.id, e.target.value)}
-                  />
-                  <input
-                    type="color"
-                    value={s.color}
-                    onChange={(e) => recolorSubject(s.id, e.target.value)}
-                    className="color-input w-14 h-10 rounded-xl border p-0"
-                  />
-                  <input
-                    type="number"
-                    min={0}
-                    className="w-24 px-2 py-1 rounded-lg bg-slate-50 border"
-                    value={s.targetMin || 0}
-                    onChange={(e) =>
-                      retargetSubject(s.id, Number(e.target.value) || 0)
-                    }
-                  />
-                  <button
-                    onClick={() => removeSubject(s.id)}
-                    className="px-2 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200"
-                  >
-                    Xóa
-                  </button>
+                <li
+                  key={s.id}
+                  className="flex items-center gap-2 text-sm"
+                >
+                  {/* chấm màu + tên (chiếm hết bên trái) */}
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span
+                      className="inline-block w-3 h-3 rounded-full shrink-0"
+                      style={{ background: s.color }}
+                    />
+                    <input
+                      className="w-full min-w-0 px-2 py-1 rounded-lg bg-slate-50 border"
+                      value={s.name}
+                      onChange={(e) => renameSubject(s.id, e.target.value)}
+                    />
+                  </div>
+
+                  {/* màu + target + Xóa ở bên phải, kích thước nhỏ gọn */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <input
+                      type="color"
+                      value={s.color}
+                      onChange={(e) => recolorSubject(s.id, e.target.value)}
+                      className="color-input w-12 h-9 rounded-xl border p-0"
+                    />
+                    <input
+                      type="number"
+                      min={0}
+                      className="w-16 px-2 py-1 rounded-lg bg-slate-50 border text-right"
+                      value={s.targetMin || 0}
+                      onChange={(e) =>
+                        retargetSubject(s.id, Number(e.target.value) || 0)
+                      }
+                    />
+                    <button
+                      onClick={() => removeSubject(s.id)}
+                      className="px-3 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 whitespace-nowrap"
+                    >
+                      Xóa
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
           )}
+
+
         </section>
 
         {/* Stats Panel */}
