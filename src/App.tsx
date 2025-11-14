@@ -332,14 +332,6 @@ export default function DailyStudyProgressVN() {
     e.target.value = ''; // reset
   }
 
-  // Quick actions
-  function markAllToday(status: Status): void {
-    const key = DATE_FMT.toKey(selectedDate);
-    for (const s of subjects) {
-      upsertRecord(key, s.id, { status });
-    }
-  }
-
   /* ===================== TIMER STATE/LOGIC ===================== */
   const [activeTimer, setActiveTimer] = useLocalStorage<ActiveTimer | null>(
     'pt.timer.v1',
