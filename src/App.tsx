@@ -636,70 +636,75 @@ export default function DailyStudyProgressVN() {
                 const key = DATE_FMT.toKey(selectedDate);
                 const entry = getEntry(key, s.id);
                 const minutes = entry.minutes || 0;
-                const st =
-                  statusFromMinutes(minutes, s.targetMin) ??
-                  (entry.status ?? null);
-                const ui =
-                  STATUS_UI[
-                    (st ?? "null") as "null" | "miss" | "partial" | "done"
-                  ];
+                const st = statusFromMinutes(minutes, s.targetMin) ?? (entry.status ?? null);
+                const ui = STATUS_UI[(st ?? "null") as "null" | "miss" | "partial" | "done"];
+
                 return (
-                  <div key={s.id} className="flex items-center gap-2">
-                    <span
-                      className="inline-block w-2.5 h-2.5 rounded-full"
-                      style={{ background: s.color }}
-                    />
-                    <span className="w-28 truncate" title={s.name}>
-                      {s.name}
-                    </span>
-                    <button
-                      className={`px-3 py-1 rounded-lg border text-sm font-semibold
-                        ${
-                          st === "done"
-                            ? "bg-emerald-100 border-emerald-200"
-                            : st === "partial"
-                            ? "bg-amber-100 border-amber-200"
-                            : st === "miss"
-                            ? "bg-rose-100 border-rose-200"
-                            : "bg-white"
-                        }`}
-                      onClick={() =>
-                        upsertRecord(key, s.id, {
-                          status: nextStatus(entry.status ?? null),
-                        })
-                      }
-                      title={ui?.title}
-                    >
-                      {ui?.label ?? "—"}
-                    </button>
-                    <input
-                      type="number"
-                      className="w-24 px-2 py-1 rounded-lg bg-slate-50 border"
-                      placeholder="phút"
-                      min={0}
-                      value={entry.minutes ?? ""}
-                      onChange={(e) =>
-                        upsertRecord(key, s.id, {
-                          minutes: Number(e.target.value) || 0,
-                        })
-                      }
-                      title="Phút đã học"
-                    />
-                    <span className="text-xs text-slate-500">
-                      / {s.targetMin || 0}′
-                    </span>
+                  <div
+                    key={s.id}
+                    className="flex flex-col sm:flex-row sm:items-center gap-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="inline-block w-2.5 h-2.5 rounded-full"
+                        style={{ background: s.color }}
+                      />
+                      <span className="sm:w-28 w-full truncate" title={s.name}>
+                        {s.name}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 sm:flex-none">
+                      <button
+                        className={`px-3 py-1 rounded-lg border text-sm font-semibold w-full sm:w-auto
+                          ${
+                            st === "done"
+                              ? "bg-emerald-100 border-emerald-200"
+                              : st === "partial"
+                              ? "bg-amber-100 border-amber-200"
+                              : st === "miss"
+                              ? "bg-rose-100 border-rose-200"
+                              : "bg-white"
+                          }`}
+                        onClick={() =>
+                          upsertRecord(key, s.id, { status: nextStatus(entry.status ?? null) })
+                        }
+                        title={ui?.title}
+                      >
+                        {ui?.label ?? "—"}
+                      </button>
+
+                      <div className="flex items-center gap-1 w-full sm:w-auto">
+                        <input
+                          type="number"
+                          className="w-full sm:w-24 px-2 py-1 rounded-lg bg-slate-50 border"
+                          placeholder="phút"
+                          min={0}
+                          value={entry.minutes ?? ""}
+                          onChange={(e) =>
+                            upsertRecord(key, s.id, {
+                              minutes: Number(e.target.value) || 0,
+                            })
+                          }
+                          title="Phút đã học"
+                        />
+                        <span className="text-xs text-slate-500 whitespace-nowrap">
+                          / {s.targetMin || 0}′
+                        </span>
+                      </div>
+                    </div>
+
                     <input
                       type="text"
-                      className="flex-1 px-2 py-1 rounded-lg bg-slate-50 border"
+                      className="px-2 py-1 rounded-lg bg-slate-50 border w-full"
                       placeholder="ghi chú (tùy chọn)"
                       value={entry.note || ""}
-                      onChange={(e) =>
-                        upsertRecord(key, s.id, { note: e.target.value })
-                      }
+                      onChange={(e) => upsertRecord(key, s.id, { note: e.target.value })}
                     />
                   </div>
                 );
               })}
+
             </div>
           )}
         </section>
