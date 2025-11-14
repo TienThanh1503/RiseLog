@@ -600,26 +600,20 @@ export default function DailyStudyProgressVN() {
             </div>
           )}
           {subjects.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              onClick={() => markAllToday("done")}
-              className="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 whitespace-nowrap"
-            >
+          <div className="mt-4 flex gap-3 flex-nowrap overflow-x-auto">
+            <button className="px-4 py-2 rounded-xl bg-green-600 text-white">
               Đánh dấu hôm nay: ✓
             </button>
-            <button
-              onClick={() => markAllToday("partial")}
-              className="px-3 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600 whitespace-nowrap"
-            >
+
+            <button className="px-4 py-2 rounded-xl bg-amber-500 text-white">
               Đánh dấu hôm nay: ½
             </button>
-            <button
-              onClick={() => markAllToday("miss")}
-              className="px-3 py-2 rounded-xl bg-rose-500 text-white hover:bg-rose-600 whitespace-nowrap"
-            >
+
+            <button className="px-4 py-2 rounded-xl bg-rose-500 text-white">
               Đánh dấu hôm nay: •
             </button>
           </div>
+
         )}
 
         </section>
@@ -833,44 +827,56 @@ export default function DailyStudyProgressVN() {
         {/* Subjects Panel */}
         <section className="bg-white rounded-2xl shadow p-4">
           <h2 className="text-lg font-semibold mb-2">📙 Môn học</h2>
-          <div className="flex flex-wrap gap-2 items-center">
+
+          {/* Hàng nhập môn mới – 4 cột: Tên | Màu | Phút | Thêm */}
+          <div className="subject-row mb-2">
+            {/* Tên môn */}
             <input
               type="text"
-              className="px-3 py-2 rounded-xl bg-slate-50 border flex-1"
+              className="border bg-slate-50 rounded-xl px-3 py-2 min-w-0"
               placeholder="Tên môn (VD: Toán, CSDL, Java, AI201)"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
             />
+
+            {/* Ô chọn màu (màu luôn lấp đầy ô) */}
+            <div className="relative h-10 rounded-xl overflow-hidden border">
               <input
                 type="color"
                 value={newColor}
                 onChange={(e) => setNewColor(e.target.value)}
-                className="color-input w-14 h-10 rounded-xl border p-0"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
+              <div className="w-full h-full" style={{ backgroundColor: newColor }} />
+            </div>
+
+
+            {/* Mục tiêu phút */}
             <input
               type="number"
               min={0}
-              className="w-24 px-3 py-2 rounded-xl bg-slate-50 border"
+              className="px-2 py-2 rounded-xl bg-slate-50 border text-right"
               value={newTarget}
               onChange={(e) => setNewTarget(Number(e.target.value) || 0)}
               title="Mục tiêu phút/ngày"
             />
+
+            {/* Nút thêm */}
             <button
               onClick={addSubject}
-              className="px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-black"
+              className="px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-black whitespace-nowrap"
             >
               Thêm
             </button>
           </div>
+
+          {/* Danh sách môn đã tạo – dùng cùng layout subject-row nên thẳng cột 100% */}
           {subjects.length > 0 && (
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-2 space-y-2">
               {subjects.map((s: Subject) => (
-                <li
-                  key={s.id}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  {/* chấm màu + tên (chiếm hết bên trái) */}
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                <li key={s.id} className="subject-row">
+                  {/* Cột 1: chấm màu + tên môn (chiếm rộng nhất) */}
+                  <div className="flex items-center gap-2 min-w-0">
                     <span
                       className="inline-block w-3 h-3 rounded-full shrink-0"
                       style={{ background: s.color }}
@@ -882,37 +888,44 @@ export default function DailyStudyProgressVN() {
                     />
                   </div>
 
-                  {/* màu + target + Xóa ở bên phải, kích thước nhỏ gọn */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  {/* Cột 2: màu */}
+                  <div className="relative h-10 rounded-xl overflow-hidden border">
                     <input
                       type="color"
                       value={s.color}
                       onChange={(e) => recolorSubject(s.id, e.target.value)}
-                      className="color-input w-12 h-9 rounded-xl border p-0"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <input
-                      type="number"
-                      min={0}
-                      className="w-16 px-2 py-1 rounded-lg bg-slate-50 border text-right"
-                      value={s.targetMin || 0}
-                      onChange={(e) =>
-                        retargetSubject(s.id, Number(e.target.value) || 0)
-                      }
-                    />
-                    <button
-                      onClick={() => removeSubject(s.id)}
-                      className="px-3 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 whitespace-nowrap"
-                    >
-                      Xóa
-                    </button>
+                    <div className="w-full h-full" style={{ backgroundColor: s.color }} />
                   </div>
+
+
+                  {/* Cột 3: target phút */}
+                  <input
+                    type="number"
+                    min={0}
+                    className="px-2 py-1 rounded-lg bg-slate-50 border text-right"
+                    value={s.targetMin || 0}
+                    onChange={(e) =>
+                      retargetSubject(s.id, Number(e.target.value) || 0)
+                    }
+                  />
+
+                  {/* Cột 4: nút Xóa */}
+                  <button
+                    onClick={() => removeSubject(s.id)}
+                    className="px-3 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 whitespace-nowrap"
+                  >
+                    Xóa
+                  </button>
                 </li>
               ))}
             </ul>
           )}
-
-
         </section>
+
+
+
 
         {/* Stats Panel */}
         <section className="bg-white rounded-2xl shadow p-4">

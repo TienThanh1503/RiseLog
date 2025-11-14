@@ -19,3 +19,10 @@
   border: none !important;
   border-radius: 0.75rem !important;
 }
+/* Lưới 4 cột cho phần Môn học:  Tên  | Màu | Phút | Nút  */
+.subject-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 0.7fr) minmax(0, 0.9fr) minmax(0, 0.9fr);
+  column-gap: 0.5rem;
+  align-items: center;
+}
